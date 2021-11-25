@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="exec" enctype="multipart/form-data">
+  <div>
     <div>
       <label for="name">氏名</label>
       <input id="name" v-model="name" type="text" />
@@ -13,31 +13,53 @@
       <label for="details">問い合わせ内容</label>
       <textarea id="details" v-model="details" />
     </div>
-    <file-uploader @onFileChanged="onFileChanged" />
+    <file-selector @onFileChanged="onFileChanged" />
     <input type="submit" @click="onSubmit" />
-  </form>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import FileUploader from "@/components/FileUploader.vue"; // @ is an alias to /src
+import FileSelector from "@/components/FileSelector.vue"; // @ is an alias to /src
 
 export default defineComponent({
   name: "Forms",
   components: {
-    FileUploader,
+    FileSelector,
   },
   setup() {
     const name = ref("");
     const email = ref("");
     const details = ref("");
 
-    const onSubmit = () => {
+    let files: File[] = [];
+
+    const onSubmit = async () => {
       console.log("onSubmit");
+      console.log(`${name.value} ${email.value} ${details.value}`);
+      console.log(files);
+
+      const fd = new FormData();
+      fd.append("name", name.value);
+      fd.append("email", email.value);
+      fd.append("details", details.value);
+
+      const blob = new Blob([files[0].name], {
+        type: "text/plain",
+      });
+      fd.append("file", blob, files[0].name);
+
+      const response = await fetch("http://localhost:3000/dev/hello", {
+        method: "POST",
+        body: fd,
+      });
+      console.log(await response.json());
     };
 
-    const onFileChanged = (e: Event) => {
+    const onFileChanged = (f: FileList) => {
       console.log("onFileChanged");
+      console.log(f);
+      files = Array.from(f);
     };
 
     return {

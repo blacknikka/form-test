@@ -1,3 +1,20 @@
+# offline
+
+- start server
+```bash
+$ ./node_modules/.bin/sls offline start
+```
+
+- confirm
+```bash
+$ curl --location -g --request POST 'http://localhost:3000/dev/hello' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "myname"
+}'
+```
+
+
 # Serverless - AWS Node.js Typescript
 
 This project has been generated using the `aws-nodejs-typescript` template from the [Serverless framework](https://www.serverless.com/).

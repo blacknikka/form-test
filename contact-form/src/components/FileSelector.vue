@@ -19,11 +19,11 @@ export default defineComponent({
     const onFileSelected = (e: Event) => {
       const target = e.target as HTMLInputElement;
 
-      if (target.files) {
+      if (target.files && target.files.length > 0) {
         const file = target.files[0];
         console.log(file);
         filename.value = file.name;
-        emit("onFileChanged", target.value);
+        emit("onFileChanged", target.files);
       }
     };
 
