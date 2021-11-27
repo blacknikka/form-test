@@ -7,14 +7,14 @@
 
     <div>
       <label for="email">メールアドレス</label>
-      <input id="email" v-model="email" />
+      <input id="email" type="email" v-model="email" />
     </div>
     <div>
       <label for="details">問い合わせ内容</label>
       <textarea id="details" v-model="details" />
     </div>
     <file-selector @onFileChanged="onFileChanged" />
-    <input type="submit" @click="onSubmit" />
+    <input type="submit" @click="onSubmit" value="送信" />
   </div>
 </template>
 
@@ -57,8 +57,6 @@ export default defineComponent({
     };
 
     const onFileChanged = (f: FileList) => {
-      console.log("onFileChanged");
-      console.log(f);
       files = Array.from(f);
     };
 
