@@ -2,12 +2,24 @@
   <div>
     <div>
       <label for="name">氏名</label>
-      <input id="name" v-model="name" type="text" />
+      <input
+        id="name"
+        v-model="nameValue"
+        type="text"
+        @input="nameHandleChange"
+      />
+      <span>{{ nameErrorMessage }}</span>
     </div>
 
     <div>
       <label for="email">メールアドレス</label>
-      <input id="email" type="email" v-model="email" />
+      <input
+        id="email"
+        type="email"
+        v-model="email"
+        @input="emailHandleChange"
+      />
+      <span>{{ emailErrorMessage }}</span>
     </div>
     <div>
       <label for="details">問い合わせ内容</label>
@@ -20,7 +32,9 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import FileSelector from "@/components/FileSelector.vue"; // @ is an alias to /src
+import { useField } from "vee-validate";
+import FileSelector from "@/components/FileSelector.vue";
+import * as yup from "yup";
 
 export default defineComponent({
   name: "Forms",
@@ -28,20 +42,30 @@ export default defineComponent({
     FileSelector,
   },
   setup() {
-    const name = ref("");
-    const email = ref("");
     const details = ref("");
 
     let files: File[] = [];
 
+    const {
+      errorMessage: nameErrorMessage,
+      value: nameValue,
+      handleChange: nameHandleChange,
+    } = useField<string>("name", yup.string().required());
+
+    const {
+      errorMessage: emailErrorMessage,
+      value: emailValue,
+      handleChange: emailHandleChange,
+    } = useField<string>("email", yup.string().required().email());
+
     const onSubmit = async () => {
       console.log("onSubmit");
-      console.log(`${name.value} ${email.value} ${details.value}`);
+      console.log(`${nameValue.value} ${emailValue.value} ${details.value}`);
       console.log(files);
 
       const fd = new FormData();
-      fd.append("name", name.value);
-      fd.append("email", email.value);
+      fd.append("name", nameValue.value);
+      fd.append("email", emailValue.value);
       fd.append("details", details.value);
 
       const blob = new Blob([files[0].name], {
@@ -61,8 +85,12 @@ export default defineComponent({
     };
 
     return {
-      name,
-      email,
+      nameValue,
+      nameErrorMessage,
+      nameHandleChange,
+      emailValue,
+      emailErrorMessage,
+      emailHandleChange,
       details,
       onSubmit,
       onFileChanged,
