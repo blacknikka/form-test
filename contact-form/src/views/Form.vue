@@ -1,54 +1,48 @@
 <template>
   <div>
-    <div>
-      <label for="name">氏名</label>
-      <input
-        id="name"
-        v-model="nameValue"
-        type="text"
-        @input="nameHandleChange"
-      />
-      <span>{{ nameErrorMessage }}</span>
-    </div>
+    <form @submit.prevent="onSubmit">
+      <div>
+        <label for="name">氏名</label>
+        <input
+          id="name"
+          v-model="nameValue"
+          type="text"
+          @input="nameHandleChange"
+        />
+        <span>{{ nameErrorMessage }}</span>
+      </div>
 
-    <div>
-      <label for="email">メールアドレス</label>
-      <input
-        id="email"
-        type="email"
-        v-model="emailValue"
-        @input="emailHandleChange"
-      />
-      <span>{{ emailErrorMessage }}</span>
-    </div>
-    <div>
-      <label for="details">問い合わせ内容</label>
-      <textarea id="details" v-model="details" />
-    </div>
-    <file-selector @onFileChanged="onFileChanged" />
-    <input
-      type="submit"
-      @click="onSubmit"
-      :disabled="!formIsValid"
-      value="送信"
-    />
+      <div>
+        <label for="email">メールアドレス</label>
+        <input
+          id="email"
+          type="email"
+          v-model="emailValue"
+          @input="emailHandleChange"
+        />
+        <span>{{ emailErrorMessage }}</span>
+      </div>
+      <div>
+        <label for="details">問い合わせ内容</label>
+        <textarea id="details" v-model="details" />
+      </div>
+      <file-selector @onFileChanged="onFileChanged" />
+      <input type="submit" :disabled="!formIsValid" value="送信" />
+    </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, inject } from "vue";
 import { useField } from "vee-validate";
 import FileSelector from "@/components/FileSelector.vue";
 import * as yup from "yup";
-import axios from "axios";
-
-interface IContactResponse {
-  name: string;
-  email: string;
-  details: string;
-  files: string[];
-  event: string;
-}
+import { contactKey } from "@/store/contact/contact";
+import {
+  Contact,
+  ContactStore,
+  ContactPostResponse,
+} from "@/store/contact/types";
 
 export default defineComponent({
   name: "Forms",
@@ -56,6 +50,11 @@ export default defineComponent({
     FileSelector,
   },
   setup() {
+    const contactStore = inject<ContactStore>(contactKey);
+    if (!contactStore) {
+      throw new Error("contact key is not provided");
+    }
+
     const details = ref("");
 
     let files: File[] = [];
@@ -65,14 +64,20 @@ export default defineComponent({
       value: nameValue,
       handleChange: nameHandleChange,
       meta: nameMeta,
-    } = useField<string>("name", yup.string().required());
+    } = useField<string>("name", yup.string().required("お名前は必須です"));
 
     const {
       errorMessage: emailErrorMessage,
       value: emailValue,
       handleChange: emailHandleChange,
       meta: emailMeta,
-    } = useField<string>("email", yup.string().required().email());
+    } = useField<string>(
+      "email",
+      yup
+        .string()
+        .required("emailは必須です")
+        .email("正しいEmailアドレスを入力してください")
+    );
 
     const formIsValid = computed(() => {
       return (
@@ -81,25 +86,14 @@ export default defineComponent({
     });
 
     const onSubmit = async () => {
-      const fd = new FormData();
-      fd.append("name", nameValue.value);
-      fd.append("email", emailValue.value);
-      fd.append("details", details.value);
-
-      Array.from(files).forEach((f) => {
-        // append each file
-        fd.append("files", f, f.name);
-      });
-
-      axios
-        .post<IContactResponse>("http://localhost:3000/dev/contact", fd, {
-          headers: {
-            "content-type": "multipart/form-data",
-          },
-        })
-        .then((result) => {
-          console.log(result.data);
-        });
+      const contact: Contact = {
+        name: nameValue.value,
+        email: emailValue.value,
+        details: details.value,
+        files: files,
+      };
+      const result = await contactStore.postContact(contact);
+      console.log(result);
     };
 
     const onFileChanged = (f: FileList) => {
