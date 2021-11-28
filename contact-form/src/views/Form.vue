@@ -40,6 +40,15 @@ import { defineComponent, ref, computed } from "vue";
 import { useField } from "vee-validate";
 import FileSelector from "@/components/FileSelector.vue";
 import * as yup from "yup";
+import axios from "axios";
+
+interface IContactResponse {
+  name: string;
+  email: string;
+  details: string;
+  files: string[];
+  event: string;
+}
 
 export default defineComponent({
   name: "Forms",
@@ -77,16 +86,20 @@ export default defineComponent({
       fd.append("email", emailValue.value);
       fd.append("details", details.value);
 
-      const blob = new Blob([files[0].name], {
-        type: "text/plain",
+      Array.from(files).forEach((f) => {
+        // append each file
+        fd.append("files", f, f.name);
       });
-      fd.append("file", blob, files[0].name);
 
-      const response = await fetch("http://localhost:3000/dev/contact", {
-        method: "POST",
-        body: fd,
-      });
-      console.log(await response.json());
+      axios
+        .post<IContactResponse>("http://localhost:3000/dev/contact", fd, {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        })
+        .then((result) => {
+          console.log(result.data);
+        });
     };
 
     const onFileChanged = (f: FileList) => {
