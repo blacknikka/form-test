@@ -10,7 +10,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/confirm",
-    name: "Done",
+    name: "Confirm",
     component: Done,
   },
 ];

@@ -1,6 +1,6 @@
-import { Contact, ContactPostResponse } from '@/store/contact/types';
+import { Contact, ContactPost } from '@/store/contact/types';
 
 export interface ContactRepositoryInterface {
-  postContact(contact: Contact): Promise<ContactPostResponse>;
+  postContact(contact: ContactPost): Promise<Contact>;
 }
 

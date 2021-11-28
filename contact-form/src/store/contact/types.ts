@@ -4,22 +4,22 @@ export interface Contact {
   name: string;
   email: string;
   details: string;
-  files: File[];
+  files: string[];
 }
 
 export interface ContactState {
   contact: Contact;
 }
 
-export interface ContactPostResponse {
+export interface ContactPost {
   name: string;
   email: string;
   details: string;
-  files: string[];
+  files: File[];
 }
 
 export interface ContactStore {
   state: DeepReadonly<ContactState>;
   getContact: () => Contact;
-  postContact: (contact: Contact) => Promise<ContactPostResponse>;
+  postContact: (contact: ContactPost) => Promise<Contact>;
 }
