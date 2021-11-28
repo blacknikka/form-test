@@ -38,7 +38,8 @@ import { useField } from "vee-validate";
 import FileSelector from "@/components/FileSelector.vue";
 import * as yup from "yup";
 import { contactKey } from "@/store/contact/contact";
-import { Contact, ContactStore } from "@/store/contact/types";
+import { ContactPost, ContactStore } from "@/store/contact/types";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Forms",
@@ -50,6 +51,8 @@ export default defineComponent({
     if (!contactStore) {
       throw new Error("contact key is not provided");
     }
+
+    const router = useRouter();
 
     const details = ref("");
 
@@ -82,7 +85,7 @@ export default defineComponent({
     });
 
     const onSubmit = async () => {
-      const contact: Contact = {
+      const contact: ContactPost = {
         name: nameValue.value,
         email: emailValue.value,
         details: details.value,
@@ -90,6 +93,10 @@ export default defineComponent({
       };
       const result = await contactStore.postContact(contact);
       console.log(result);
+
+      router.push({
+        name: "Confirm",
+      });
     };
 
     const onFileChanged = (f: FileList) => {

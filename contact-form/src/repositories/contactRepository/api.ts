@@ -1,5 +1,5 @@
 import { ContactRepositoryInterface } from './types';
-import { Contact, ContactPostResponse } from '@/store/contact/types';
+import { Contact, ContactPost } from '@/store/contact/types';
 import axios from "axios";
 
 export class ContactRepository implements ContactRepositoryInterface {
@@ -9,7 +9,7 @@ export class ContactRepository implements ContactRepositoryInterface {
     return `${this.ENDPOINT}${path}`;
   }
 
-  async postContact(contact: Contact): Promise<ContactPostResponse> {
+  async postContact(contact: ContactPost): Promise<Contact> {
     const fd = new FormData();
     fd.append("name", contact.name);
     fd.append("email", contact.email);
@@ -33,7 +33,7 @@ export class ContactRepository implements ContactRepositoryInterface {
           email: response.data.email,
           details: response.data.details,
           files: response.data.files,
-      } as ContactPostResponse);
+      } as Contact);
     } else {
       const err = response.data.json();
       throw new Error(`APi error: ${err}`);

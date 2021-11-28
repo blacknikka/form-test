@@ -1,53 +1,42 @@
 <template>
   <div>
     <h1>受け付けました</h1>
-    <td>
+    <table>
       <tr>
-        <span>氏名</span>
-        <span>{{ name }}</span>
+        <td>氏名</td>
+        <td>{{ name }}</td>
       </tr>
       <tr>
-        <span>e-mail</span>
-        <span>{{ email }}}</span>
+        <td>e-mail</td>
+        <td>{{ email }}</td>
       </tr>
       <tr>
-        <span>お問い合わせ内容</span>
-        <span>{{ details }}}</span>
+        <td>お問い合わせ内容</td>
+        <td>{{ details }}</td>
       </tr>
       <tr>
-        <span>ファイル</span>
-        <span>{{ files }}}</span>
+        <td>ファイル</td>
+        <td>{{ files }}</td>
       </tr>
-    </td>
+    </table>
     <button type="button" @click="onClick">完了</button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, inject } from "vue";
 import { useRouter } from "vue-router";
+import { contactKey } from "@/store/contact/contact";
+import { ContactStore } from "@/store/contact/types";
 
 export default defineComponent({
   name: "Done",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    details: {
-      type: String,
-      required: true,
-    },
-    files: {
-      type: Array as PropType<string[]>,
-      required: true,
-    },
-  },
   setup() {
+    const contactStore = inject<ContactStore>(contactKey);
+    if (!contactStore) {
+      throw new Error("contact key is not provided");
+    }
+
     const router = useRouter();
 
     const onClick = () => {
@@ -56,8 +45,15 @@ export default defineComponent({
       });
     };
 
+    const contact = contactStore.getContact();
+    const { name, email, details, files } = contact;
+
     return {
       onClick,
+      name,
+      email,
+      details,
+      files,
     };
   },
 });

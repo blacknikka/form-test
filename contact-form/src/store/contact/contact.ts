@@ -3,7 +3,7 @@ import {
   Contact,
   ContactState,
   ContactStore,
-  ContactPostResponse,
+  ContactPost,
 } from './types';
 
 import Repository from '@/repositories/repositoryFactory';
@@ -21,8 +21,15 @@ const getContact = (): Contact => {
   return state.contact;
 };
 
-const postContact = async (contact: Contact): Promise<ContactPostResponse> => {
-  return await Repository.contact().postContact(contact);
+const postContact = async (contact: ContactPost): Promise<Contact> => {
+  const result = await Repository.contact().postContact(contact);
+
+  // set store
+  state.contact.name = result.name;
+  state.contact.email = result.email;
+  state.contact.details = result.details;
+  state.contact.files = result.files;
+  return result;
 };
 
 const contactStore: ContactStore = {
