@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import hello from '@functions/hello';
+import contact from '@functions/contact';
 
 const serverlessConfiguration: AWS = {
   service: 'file-server',
@@ -20,7 +21,7 @@ const serverlessConfiguration: AWS = {
     lambdaHashingVersion: '20201221',
   },
   // import the function via paths
-  functions: { hello },
+  functions: { hello, contact },
   package: { individually: true },
   custom: {
     esbuild: {
