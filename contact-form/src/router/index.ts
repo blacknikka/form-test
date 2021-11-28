@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Forms from "@/views/Form.vue";
+import Done from "@/views/Done.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Forms",
     component: Forms,
+  },
+  {
+    path: "/confirm",
+    name: "Done",
+    component: Done,
   },
 ];
 
