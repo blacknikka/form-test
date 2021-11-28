@@ -38,11 +38,7 @@ import { useField } from "vee-validate";
 import FileSelector from "@/components/FileSelector.vue";
 import * as yup from "yup";
 import { contactKey } from "@/store/contact/contact";
-import {
-  Contact,
-  ContactStore,
-  ContactPostResponse,
-} from "@/store/contact/types";
+import { Contact, ContactStore } from "@/store/contact/types";
 
 export default defineComponent({
   name: "Forms",
