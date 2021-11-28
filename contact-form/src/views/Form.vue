@@ -16,7 +16,7 @@
       <input
         id="email"
         type="email"
-        v-model="email"
+        v-model="emailValue"
         @input="emailHandleChange"
       />
       <span>{{ emailErrorMessage }}</span>
@@ -26,12 +26,17 @@
       <textarea id="details" v-model="details" />
     </div>
     <file-selector @onFileChanged="onFileChanged" />
-    <input type="submit" @click="onSubmit" value="送信" />
+    <input
+      type="submit"
+      @click="onSubmit"
+      :disabled="!formIsValid"
+      value="送信"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { useField } from "vee-validate";
 import FileSelector from "@/components/FileSelector.vue";
 import * as yup from "yup";
@@ -50,13 +55,21 @@ export default defineComponent({
       errorMessage: nameErrorMessage,
       value: nameValue,
       handleChange: nameHandleChange,
+      meta: nameMeta,
     } = useField<string>("name", yup.string().required());
 
     const {
       errorMessage: emailErrorMessage,
       value: emailValue,
       handleChange: emailHandleChange,
+      meta: emailMeta,
     } = useField<string>("email", yup.string().required().email());
+
+    const formIsValid = computed(() => {
+      return (
+        nameMeta.dirty && nameMeta.valid && emailMeta.dirty && emailMeta.valid
+      );
+    });
 
     const onSubmit = async () => {
       console.log("onSubmit");
@@ -85,12 +98,15 @@ export default defineComponent({
     };
 
     return {
+      formIsValid,
       nameValue,
       nameErrorMessage,
       nameHandleChange,
+      nameMeta,
       emailValue,
       emailErrorMessage,
       emailHandleChange,
+      emailMeta,
       details,
       onSubmit,
       onFileChanged,
