@@ -72,10 +72,6 @@ export default defineComponent({
     });
 
     const onSubmit = async () => {
-      console.log("onSubmit");
-      console.log(`${nameValue.value} ${emailValue.value} ${details.value}`);
-      console.log(files);
-
       const fd = new FormData();
       fd.append("name", nameValue.value);
       fd.append("email", emailValue.value);
@@ -86,7 +82,7 @@ export default defineComponent({
       });
       fd.append("file", blob, files[0].name);
 
-      const response = await fetch("http://localhost:3000/dev/hello", {
+      const response = await fetch("http://localhost:3000/dev/contact", {
         method: "POST",
         body: fd,
       });
