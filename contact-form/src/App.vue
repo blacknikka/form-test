@@ -2,6 +2,18 @@
   <router-view />
 </template>
 
+<script lang="ts">
+import { defineComponent, provide } from "vue";
+import contactStore, { contactKey } from "@/store/contact/contact";
+
+export default defineComponent({
+  name: "App",
+  setup() {
+    provide(contactKey, contactStore);
+  },
+});
+</script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
