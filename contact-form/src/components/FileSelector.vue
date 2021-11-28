@@ -3,28 +3,52 @@
     <div>ファイルアップロード</div>
     <div>
       <label for="filename">ファイル名</label>
+      <span>{{ errorMessage }}</span>
     </div>
-    <input ref="fileupload" type="file" @change="onFileSelected" multiple/>
+    <input type="file" :v-model="value" @change="onFileSelected" multiple />
     <!-- <input type="button" @click="onFileClearClicked" value="クリア" /> -->
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import * as yup from "yup";
+import { useField } from "vee-validate";
 
 export default defineComponent({
+  props: {
+    max: {
+      type: Number,
+      default: 10_000_000, // 10MB
+    },
+  },
   emits: ["onFileChanged"],
   setup(props, { emit }) {
     let filename = ref("");
     // const fileupload = ref<HTMLInputElement>();
 
-    const onFileSelected = (e: Event) => {
+    const { errorMessage, value, handleChange, meta, validate } = useField<File[]>(
+      "file",
+      yup
+        .mixed()
+        .notRequired()
+        .test("fileSize", "ファイルサイズの合計は10MBまでです", (value) => {
+          return (
+            value &&
+            value.reduce((prev: number, current: File) => {
+              return prev + current.size;
+            }, 0) < props.max
+          );
+        })
+    );
+
+    const onFileSelected = async (e: Event) => {
+      handleChange(e, true);
+
       const target = e.target as HTMLInputElement;
 
       if (target.files && target.files.length > 0) {
-        const file = target.files[0];
-        // filename.value = Array.from(target.files).map((file: File) => file.name).join(", ");
-        emit("onFileChanged", target.files);
+        emit("onFileChanged", target.files, (await validate()).valid);
       }
     };
 
@@ -40,6 +64,9 @@ export default defineComponent({
       // onFileClearClicked,
       filename,
       // fileupload,
+      errorMessage,
+      value,
+      meta,
     };
   },
 });

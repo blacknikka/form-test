@@ -55,6 +55,7 @@ export default defineComponent({
     const router = useRouter();
 
     const details = ref("");
+    const isFilesValid = ref(true);
 
     let files: File[] = [];
 
@@ -80,7 +81,11 @@ export default defineComponent({
 
     const formIsValid = computed(() => {
       return (
-        nameMeta.dirty && nameMeta.valid && emailMeta.dirty && emailMeta.valid
+        nameMeta.dirty &&
+        nameMeta.valid &&
+        emailMeta.dirty &&
+        emailMeta.valid &&
+        isFilesValid.value
       );
     });
 
@@ -91,16 +96,17 @@ export default defineComponent({
         details: details.value,
         files: files,
       };
-      const result = await contactStore.postContact(contact);
-      console.log(result);
+      await contactStore.postContact(contact);
 
       router.push({
         name: "Confirm",
       });
     };
 
-    const onFileChanged = (f: FileList) => {
+    const onFileChanged = (f: FileList, isValid: boolean) => {
       files = Array.from(f);
+
+      isFilesValid.value = isValid;
     };
 
     return {
@@ -116,6 +122,7 @@ export default defineComponent({
       details,
       onSubmit,
       onFileChanged,
+      isFilesValid,
     };
   },
 });
